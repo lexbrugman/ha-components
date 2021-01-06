@@ -31,7 +31,7 @@ from .const import (
     DOMAIN,
     CONF_SITE_ID,
     CONF_HOME_SUBNET,
-    CONF_FIXED_DEVICES,
+    CONF_FIXED_HOSTS,
     DEFAULT_SCAN_INTERVAL,
 )
 from .unifi import UnifiClient
@@ -45,7 +45,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_PASSWORD): cv.string,
     vol.Required(CONF_SITE_ID): cv.string,
     vol.Required(CONF_HOME_SUBNET): cv.string,
-    vol.Optional(CONF_FIXED_DEVICES, default=[]): cv.ensure_list,
+    vol.Optional(CONF_FIXED_HOSTS, default=[]): cv.ensure_list,
 })
 
 
@@ -60,7 +60,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     password = entry.options.get(CONF_PASSWORD)
     site_id = entry.options.get(CONF_SITE_ID)
     home_subnet = entry.options.get(CONF_HOME_SUBNET)
-    fixed_devices = entry.options.get(CONF_FIXED_DEVICES)
+    fixed_hosts = entry.options.get(CONF_FIXED_HOSTS)
     scan_interval = entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
 
     unifi_client = UnifiClient(
@@ -86,7 +86,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 continue
 
             client_hostname = wireless_client.get("name", wireless_client.get("hostname", ""))
-            if not client_hostname or client_hostname in fixed_devices:
+            if not client_hostname or client_hostname in fixed_hosts:
                 continue
 
             online_hosts.append(client_hostname)
