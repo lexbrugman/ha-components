@@ -6,7 +6,6 @@ from netaddr import (
     IPNetwork,
 )
 
-from homeassistant.components.device_tracker import PLATFORM_SCHEMA
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import (
     Config,
@@ -38,15 +37,22 @@ from .unifi import UnifiClient
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
-    vol.Optional(CONF_NAME, default=DEVICE_DEFAULT_NAME): cv.string,
-    vol.Required(CONF_HOST): cv.string,
-    vol.Required(CONF_USERNAME): cv.string,
-    vol.Required(CONF_PASSWORD): cv.string,
-    vol.Required(CONF_SITE_ID): cv.string,
-    vol.Required(CONF_HOME_SUBNET): cv.string,
-    vol.Optional(CONF_FIXED_HOSTS, default=[]): cv.ensure_list,
-})
+CONFIG_SCHEMA = vol.Schema(
+    {
+        DOMAIN: vol.Schema(
+            {
+                vol.Optional(CONF_NAME, default=DEVICE_DEFAULT_NAME): cv.string,
+                vol.Required(CONF_HOST): cv.string,
+                vol.Required(CONF_USERNAME): cv.string,
+                vol.Required(CONF_PASSWORD): cv.string,
+                vol.Required(CONF_SITE_ID): cv.string,
+                vol.Required(CONF_HOME_SUBNET): cv.string,
+                vol.Optional(CONF_FIXED_HOSTS, default=[]): cv.ensure_list,
+            }
+        )
+    },
+    extra=vol.ALLOW_EXTRA,
+)
 
 
 async def async_setup(hass: HomeAssistant, config: Config) -> bool:
