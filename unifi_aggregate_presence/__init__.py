@@ -25,13 +25,13 @@ from homeassistant.const import (
     CONF_USERNAME,
     CONF_PASSWORD,
     CONF_SCAN_INTERVAL,
-    CONF_HOME_SUBNET,
-    CONF_FIXED_DEVICES,
 )
 
 from .const import (
     DOMAIN,
     CONF_SITE_ID,
+    CONF_HOME_SUBNET,
+    CONF_FIXED_DEVICES,
     DEFAULT_SCAN_INTERVAL,
 )
 from .unifi import UnifiClient
