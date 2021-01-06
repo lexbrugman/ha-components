@@ -1,0 +1,11 @@
+{
+  "domain": "unifi_aggregate_presence",
+  "name": "Simplified UniFi device tracker consolidating into one tracking device",
+  "documentation": "https://github.com/lexbrugman/ha-components/tree/master/unifi_aggregate_presence",
+  "dependencies": [],
+  "codeowners": ["@lexbrugman"],
+  "requirements": [
+    "pyunifi==2.20.1",
+    "netaddr==0.7.19"
+  ]
+}
