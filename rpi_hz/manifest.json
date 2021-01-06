@@ -1,0 +1,8 @@
+{
+  "domain": "rpi_hz",
+  "name": "Sensors that derives a frequency value from a RPi GPIO",
+  "documentation": "https://github.com/lexbrugman/ha-components",
+  "dependencies": ["rpi_gpio"],
+  "codeowners": ["lexbrugman"],
+  "requirements": []
+}
