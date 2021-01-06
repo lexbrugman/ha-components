@@ -1,6 +1,5 @@
 import logging
 import voluptuous as vol
-
 from time import time
 
 from homeassistant.components import rpi_gpio as rpi_gpio
@@ -11,12 +10,12 @@ from homeassistant.const import CONF_UNIT_OF_MEASUREMENT
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.entity import Entity
 
-CONF_PORTS = "ports"
-CONF_MULTIPLIER = "multiplier"
-
-PULL_MODE = "DOWN"
-
-DEPENDENCIES = ["rpi_gpio"]
+from .const import (
+    DOMAIN,
+    CONF_PORTS,
+    CONF_MULTIPLIER,
+    PULL_MODE,
+)
 
 PORT_SCHEMA = vol.Schema({
     vol.Required(CONF_NAME): cv.string,
