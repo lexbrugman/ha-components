@@ -51,6 +51,7 @@ CONFIG_SCHEMA = vol.Schema(
                 vol.Required(CONF_SITE_ID): cv.string,
                 vol.Required(CONF_HOME_SUBNET): cv.string,
                 vol.Optional(CONF_FIXED_HOSTS, default=[]): cv.ensure_list,
+                vol.Optional(CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL): cv.positive_int,
             }
         )
     },
@@ -78,7 +79,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     site_id = entry.data.get(CONF_SITE_ID)
     home_subnet = entry.data.get(CONF_HOME_SUBNET)
     fixed_hosts = entry.data.get(CONF_FIXED_HOSTS)
-    scan_interval = entry.data.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+    scan_interval = entry.data.get(CONF_SCAN_INTERVAL)
 
     unifi_client = UnifiClient(
         hostname,
