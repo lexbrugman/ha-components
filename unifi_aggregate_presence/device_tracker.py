@@ -48,6 +48,12 @@ class UnifiAggregateEntity(CoordinatorEntity, TrackerEntity):
     def icon(self):
         return "mdi:map-marker-outline"
 
+    @property
+    def device_state_attributes(self):
+        return {
+            "online_device_count": len(self._online_hosts()),
+        }
+
     def _online_hosts(self):
         return self.coordinator.data
 
