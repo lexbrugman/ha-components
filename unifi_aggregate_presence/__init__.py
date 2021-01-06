@@ -6,7 +6,10 @@ from netaddr import (
     IPNetwork,
 )
 
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import (
+    ConfigEntry,
+    SOURCE_IMPORT,
+)
 from homeassistant.core import (
     Config,
     HomeAssistant,
@@ -56,18 +59,26 @@ CONFIG_SCHEMA = vol.Schema(
 
 
 async def async_setup(hass: HomeAssistant, config: Config) -> bool:
+    if DOMAIN in config:
+        for entry in config[DOMAIN]:
+            hass.async_create_task(
+                hass.config_entries.flow.async_init(
+                    DOMAIN, context={"source": SOURCE_IMPORT}, data=entry
+                )
+            )
+
     hass.data[DOMAIN] = {}
     return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    hostname = entry.options.get(CONF_HOST)
-    username = entry.options.get(CONF_USERNAME)
-    password = entry.options.get(CONF_PASSWORD)
-    site_id = entry.options.get(CONF_SITE_ID)
-    home_subnet = entry.options.get(CONF_HOME_SUBNET)
-    fixed_hosts = entry.options.get(CONF_FIXED_HOSTS)
-    scan_interval = entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+    hostname = entry.data.get(CONF_HOST)
+    username = entry.data.get(CONF_USERNAME)
+    password = entry.data.get(CONF_PASSWORD)
+    site_id = entry.data.get(CONF_SITE_ID)
+    home_subnet = entry.data.get(CONF_HOME_SUBNET)
+    fixed_hosts = entry.data.get(CONF_FIXED_HOSTS)
+    scan_interval = entry.data.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
 
     unifi_client = UnifiClient(
         hostname,
