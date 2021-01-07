@@ -1,6 +1,7 @@
 import datetime
 import logging
 import voluptuous as vol
+from syncasync import sync_to_async
 from netaddr import (
     IPAddress,
     IPNetwork,
@@ -77,7 +78,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     fixed_hosts = config_data.get(CONF_FIXED_HOSTS)
     scan_interval = config_data.get(CONF_SCAN_INTERVAL)
 
-    unifi_client = UnifiClient(
+    unifi_client = await _async_get_unifi_client(
         hostname,
         username,
         password,
@@ -86,7 +87,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         site_id=site_id,
     )
 
-    async def async_update_data():
+    @sync_to_async
+    def _async_update_data():
         online_hosts = []
 
         try:
@@ -112,7 +114,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         _LOGGER,
         name=DOMAIN,
         update_interval=datetime.timedelta(minutes=scan_interval),
-        update_method=async_update_data,
+        update_method=_async_update_data,
     )
     await coordinator.async_refresh()
 
@@ -135,3 +137,8 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
 
 async def update_listener(hass: HomeAssistant, entry: ConfigEntry):
     await hass.config_entries.async_reload(entry.entry_id)
+
+
+@sync_to_async
+def _async_get_unifi_client(*args, **kwargs):
+    return UnifiClient(*args, **kwargs)

@@ -5,6 +5,7 @@
   "codeowners": ["@lexbrugman"],
   "requirements": [
     "pyunifi==2.20.1",
-    "netaddr==0.7.19"
+    "netaddr==0.7.19",
+    "syncasync==20180812"
   ]
 }
