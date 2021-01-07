@@ -41,7 +41,7 @@ class UnifiAggregateEntity(CoordinatorEntity, TrackerEntity):
 
     @property
     def name(self):
-        return self._config_data.data.get(CONF_NAME)
+        return self._config_data.get(CONF_NAME)
 
     @property
     def source_type(self):
