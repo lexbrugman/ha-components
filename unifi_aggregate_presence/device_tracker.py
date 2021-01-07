@@ -52,6 +52,14 @@ class UnifiAggregateEntity(CoordinatorEntity, TrackerEntity):
         return "mdi:map-marker-outline"
 
     @property
+    def latitude(self):
+        return None
+
+    @property
+    def longitude(self):
+        return None
+
+    @property
     def device_state_attributes(self):
         return {
             "online_device_count": len(self._online_hosts()),
