@@ -6,10 +6,7 @@ from netaddr import (
     IPNetwork,
 )
 
-from homeassistant.config_entries import (
-    ConfigEntry,
-    SOURCE_IMPORT,
-)
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import (
     Config,
     HomeAssistant,
@@ -31,6 +28,8 @@ from homeassistant.const import (
 
 from .const import (
     DOMAIN,
+    CONFIG,
+    ENTRIES,
     CONF_SITE_ID,
     CONF_HOME_SUBNET,
     CONF_FIXED_HOSTS,
@@ -60,26 +59,23 @@ CONFIG_SCHEMA = vol.Schema(
 
 
 async def async_setup(hass: HomeAssistant, config: Config) -> bool:
-    if DOMAIN in config:
-        for entry in config[DOMAIN]:
-            hass.async_create_task(
-                hass.config_entries.flow.async_init(
-                    DOMAIN, context={"source": SOURCE_IMPORT}, data=entry
-                )
-            )
-
-    hass.data[DOMAIN] = {}
+    hass.data[DOMAIN] = {
+        ENTRIES: {},
+        CONFIG: config[DOMAIN],
+    }
     return True
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
-    hostname = entry.data.get(CONF_HOST)
-    username = entry.data.get(CONF_USERNAME)
-    password = entry.data.get(CONF_PASSWORD)
-    site_id = entry.data.get(CONF_SITE_ID)
-    home_subnet = entry.data.get(CONF_HOME_SUBNET)
-    fixed_hosts = entry.data.get(CONF_FIXED_HOSTS)
-    scan_interval = entry.data.get(CONF_SCAN_INTERVAL)
+    config_data = hass.data[DOMAIN][CONFIG]
+
+    hostname = config_data.get(CONF_HOST)
+    username = config_data.get(CONF_USERNAME)
+    password = config_data.get(CONF_PASSWORD)
+    site_id = config_data.get(CONF_SITE_ID)
+    home_subnet = config_data.get(CONF_HOME_SUBNET)
+    fixed_hosts = config_data.get(CONF_FIXED_HOSTS)
+    scan_interval = config_data.get(CONF_SCAN_INTERVAL)
 
     unifi_client = UnifiClient(
         hostname,
@@ -120,7 +116,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     )
     await coordinator.async_refresh()
 
-    hass.data[DOMAIN][entry.entry_id] = coordinator
+    hass.data[DOMAIN][ENTRIES][entry.entry_id] = coordinator
     hass.async_create_task(
         hass.config_entries.async_forward_entry_setup(entry, DEVICE_TRACKER)
     )
@@ -132,7 +128,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
     unload_ok = await hass.config_entries.async_forward_entry_unload(entry, DEVICE_TRACKER)
 
     if unload_ok:
-        hass.data[DOMAIN].pop(entry.entry_id)
+        hass.data[DOMAIN][ENTRIES].pop(entry.entry_id)
 
     return unload_ok
 

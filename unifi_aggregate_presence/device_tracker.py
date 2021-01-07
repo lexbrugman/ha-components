@@ -13,24 +13,27 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
     DOMAIN,
+    CONFIG,
+    ENTRIES,
 )
 
 _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities):
-    coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator = hass.data[DOMAIN][ENTRIES][entry.entry_id]
+    config_data = hass.data[DOMAIN][CONFIG]
     async_add_entities([UnifiAggregateEntity(
-        entry,
         coordinator,
+        config_data,
     )], True)
 
 
 class UnifiAggregateEntity(CoordinatorEntity, TrackerEntity):
-    def __init__(self, entry: ConfigEntry, coordinator):
+    def __init__(self, coordinator, config_data: dict):
         super(UnifiAggregateEntity, self).__init__(coordinator)
 
-        self._entry = entry
+        self._config_data = config_data
 
     @property
     def location_name(self):
@@ -38,7 +41,7 @@ class UnifiAggregateEntity(CoordinatorEntity, TrackerEntity):
 
     @property
     def name(self):
-        return self._entry.data.get(CONF_NAME)
+        return self._config_data.data.get(CONF_NAME)
 
     @property
     def source_type(self):
