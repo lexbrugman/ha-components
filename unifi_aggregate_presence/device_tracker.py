@@ -36,6 +36,10 @@ class UnifiAggregateEntity(CoordinatorEntity, TrackerEntity):
         self._config_data = config_data
 
     @property
+    def unique_id(self):
+        return "unifi-aggregate-anyone"
+
+    @property
     def location_name(self):
         return STATE_HOME if self._is_someone_home() else STATE_NOT_HOME
 
