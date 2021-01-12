@@ -8,7 +8,10 @@ from homeassistant.const import (
     STATE_NOT_HOME,
     CONF_NAME,
 )
-from homeassistant.core import HomeAssistant
+from homeassistant.core import (
+    callback,
+    HomeAssistant,
+)
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
@@ -66,11 +69,24 @@ class UnifiAggregateEntity(CoordinatorEntity, TrackerEntity):
     @property
     def device_state_attributes(self):
         return {
-            "online_device_count": len(self._online_hosts()),
+            "online_device_count": self._online_host_count(),
         }
+    
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+        self.async_on_remove(
+            self.coordinator.async_add_listener(self._state_updated)
+        )
+    
+    @callback
+    def _state_updated(self) -> None:
+        _LOGGER.info(f"state updated {self._online_host_count()}")
 
     def _online_hosts(self):
         return self.coordinator.data
 
+    def _online_host_count(self):
+        return len(self._online_hosts())
+
     def _is_someone_home(self):
-        return len(self._online_hosts()) > 0
+        return self._online_host_count() > 0
