@@ -1,12 +1,13 @@
 import logging
+from time import time
 
 from homeassistant.components.device_tracker.config_entry import TrackerEntity
 from homeassistant.components.device_tracker.const import SOURCE_TYPE_ROUTER
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
+    CONF_NAME,
     STATE_HOME,
     STATE_NOT_HOME,
-    CONF_NAME,
 )
 from homeassistant.core import (
     callback,
@@ -15,6 +16,7 @@ from homeassistant.core import (
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
+    AWAY_GRACE_TIME,
     DOMAIN,
     CONFIG,
     ENTRIES,
@@ -37,6 +39,7 @@ class UnifiAggregateEntity(CoordinatorEntity, TrackerEntity):
         super(UnifiAggregateEntity, self).__init__(coordinator)
 
         self._config_data = config_data
+        self._last_home_time = time()
 
     @property
     def unique_id(self):
@@ -44,7 +47,10 @@ class UnifiAggregateEntity(CoordinatorEntity, TrackerEntity):
 
     @property
     def location_name(self):
-        return STATE_HOME if self._is_someone_home() else STATE_NOT_HOME
+        if self._seconds_since_last_home() <= AWAY_GRACE_TIME:
+            return STATE_HOME
+
+        return STATE_NOT_HOME
 
     @property
     def name(self):
@@ -80,13 +86,17 @@ class UnifiAggregateEntity(CoordinatorEntity, TrackerEntity):
     
     @callback
     def _state_updated(self) -> None:
-        _LOGGER.info(f"state updated {self._online_host_count()}")
+        if self._is_someone_home():
+            self._last_home_time = time()
 
-    def _online_hosts(self):
+    def _online_hosts(self) -> list:
         return self.coordinator.data
 
-    def _online_host_count(self):
+    def _online_host_count(self) -> int:
         return len(self._online_hosts())
 
-    def _is_someone_home(self):
+    def _is_someone_home(self) -> bool:
         return self._online_host_count() > 0
+
+    def _seconds_since_last_home(self) -> float:
+        return time() - self._last_home_time
