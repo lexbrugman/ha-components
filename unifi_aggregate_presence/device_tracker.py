@@ -39,7 +39,7 @@ class UnifiAggregateEntity(CoordinatorEntity, TrackerEntity):
         super(UnifiAggregateEntity, self).__init__(coordinator)
 
         self._config_data = config_data
-        self._last_home_time = time()
+        self._last_home_time = 0.0
 
     @property
     def unique_id(self):
@@ -77,13 +77,13 @@ class UnifiAggregateEntity(CoordinatorEntity, TrackerEntity):
         return {
             "online_device_count": self._online_host_count(),
         }
-    
+
     async def async_added_to_hass(self) -> None:
         await super().async_added_to_hass()
         self.async_on_remove(
             self.coordinator.async_add_listener(self._state_updated)
         )
-    
+
     @callback
     def _state_updated(self) -> None:
         if self._is_someone_home():
