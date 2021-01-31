@@ -15,4 +15,4 @@ class FlowHandler(config_entries.ConfigFlow):
         if self._async_current_entries():
             return self.async_abort(reason="single_instance_allowed")
 
-        return self.async_create_entry(title="configuration.yaml", data={})
+        return self.async_create_entry(title=DOMAIN, data={})

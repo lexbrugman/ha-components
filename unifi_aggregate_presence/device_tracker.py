@@ -39,7 +39,7 @@ class UnifiAggregateEntity(CoordinatorEntity, TrackerEntity):
         super(UnifiAggregateEntity, self).__init__(coordinator)
 
         self._config_data = config_data
-        self._last_home_time = 0.0
+        self._last_seen_time = 0.0
 
     @property
     def unique_id(self):
@@ -47,7 +47,7 @@ class UnifiAggregateEntity(CoordinatorEntity, TrackerEntity):
 
     @property
     def location_name(self):
-        if self._seconds_since_last_home() <= AWAY_GRACE_TIME:
+        if self._seconds_since_last_seen() <= AWAY_GRACE_TIME:
             return STATE_HOME
 
         return STATE_NOT_HOME
@@ -76,6 +76,7 @@ class UnifiAggregateEntity(CoordinatorEntity, TrackerEntity):
     def device_state_attributes(self):
         return {
             "online_device_count": self._online_host_count(),
+            "seconds_since_last_seen": self._seconds_since_last_seen(),
         }
 
     async def async_added_to_hass(self) -> None:
@@ -87,7 +88,7 @@ class UnifiAggregateEntity(CoordinatorEntity, TrackerEntity):
     @callback
     def _state_updated(self) -> None:
         if self._is_someone_home():
-            self._last_home_time = time()
+            self._last_seen_time = time()
 
     def _online_hosts(self) -> list:
         return self.coordinator.data
@@ -98,5 +99,5 @@ class UnifiAggregateEntity(CoordinatorEntity, TrackerEntity):
     def _is_someone_home(self) -> bool:
         return self._online_host_count() > 0
 
-    def _seconds_since_last_home(self) -> float:
-        return time() - self._last_home_time
+    def _seconds_since_last_seen(self) -> float:
+        return time() - self._last_seen_time
