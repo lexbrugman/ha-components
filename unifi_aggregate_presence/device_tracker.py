@@ -76,7 +76,7 @@ class UnifiAggregateEntity(CoordinatorEntity, TrackerEntity):
     def device_state_attributes(self):
         return {
             "online_device_count": self._online_host_count(),
-            "seconds_since_last_seen": self._seconds_since_last_seen(),
+            "seconds_since_last_seen": round(self._seconds_since_last_seen()),
         }
 
     async def async_added_to_hass(self) -> None:
