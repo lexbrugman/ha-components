@@ -1,6 +1,7 @@
 {
   "domain": "unifi_aggregate_presence",
   "name": "UniFi simplified device tracking",
+  "version": "1.0.0",
   "documentation": "https://github.com/lexbrugman/ha-components/tree/master/unifi_aggregate_presence",
   "codeowners": ["@lexbrugman"],
   "requirements": [
