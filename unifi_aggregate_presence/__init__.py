@@ -75,7 +75,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     password = config_data.get(CONF_PASSWORD)
     site_id = config_data.get(CONF_SITE_ID)
     home_subnet = config_data.get(CONF_HOME_SUBNET)
-    fixed_hosts = config_data.get(CONF_FIXED_HOSTS)
+    fixed_hosts = [h.lower() for h in config_data.get(CONF_FIXED_HOSTS)]
     scan_interval = config_data.get(CONF_SCAN_INTERVAL)
 
     unifi_client = await _async_get_unifi_client(
@@ -102,7 +102,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 continue
 
             client_hostname = wireless_client.get("name", wireless_client.get("hostname", ""))
-            if not client_hostname or client_hostname in fixed_hosts:
+            if not client_hostname or client_hostname.lower() in fixed_hosts:
                 continue
 
             online_hosts.append(client_hostname)
