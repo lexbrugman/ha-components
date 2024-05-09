@@ -2,7 +2,7 @@ import logging
 from time import time
 
 from homeassistant.components.device_tracker.config_entry import TrackerEntity
-from homeassistant.components.device_tracker.const import SOURCE_TYPE_ROUTER
+from homeassistant.components.device_tracker.const import SourceType
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     CONF_NAME,
@@ -58,7 +58,7 @@ class UnifiAggregateEntity(CoordinatorEntity, TrackerEntity):
 
     @property
     def source_type(self):
-        return SOURCE_TYPE_ROUTER
+        return SourceType.ROUTER
 
     @property
     def icon(self):
