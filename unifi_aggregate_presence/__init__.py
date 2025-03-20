@@ -8,10 +8,8 @@ from netaddr import (
 )
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import (
-    Config,
-    HomeAssistant,
-)
+from homeassistant.core import HomeAssistant
+from homeassistant.core_config import Config
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
@@ -57,6 +55,7 @@ CONFIG_SCHEMA = vol.Schema(
     },
     extra=vol.ALLOW_EXTRA,
 )
+DEVICE_TRACKERS = [DEVICE_TRACKER]
 
 
 async def async_setup(hass: HomeAssistant, config: Config) -> bool:
@@ -119,15 +118,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await coordinator.async_refresh()
 
     hass.data[DOMAIN][ENTRIES][entry.entry_id] = coordinator
-    hass.async_create_task(
-        hass.config_entries.async_forward_entry_setup(entry, DEVICE_TRACKER)
-    )
+    await hass.config_entries.async_forward_entry_setups(entry, DEVICE_TRACKERS)
 
     return True
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry):
-    unload_ok = await hass.config_entries.async_forward_entry_unload(entry, DEVICE_TRACKER)
+    unload.ok = await hass.config_entries.async_unload_platforms(entry, DEVICE_TRACKERS)
 
     if unload_ok:
         hass.data[DOMAIN][ENTRIES].pop(entry.entry_id)
